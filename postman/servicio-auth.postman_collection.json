@@ -1,0 +1,96 @@
+{
+  "info": {
+    "name": "Servicio Auth API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health: GET /",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.test('Campo status presente', function () { pm.expect(json).to.have.property('status'); });",
+              "pm.test('API activa', function () { pm.expect(json.status).to.eql('API activa'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Registro: POST /api/register",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "name": "Content-Type", "value": "application/json", "type": "text" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/register"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+              "const json = pm.response.json();",
+              "pm.test('Mensaje de registro', function () { pm.expect(json.message).to.eql('Registro exitoso'); });",
+              "pm.test('Usuario retornado', function () { pm.expect(json.user).to.eql(pm.variables.get('username')); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Login: POST /api/login",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "name": "Content-Type", "value": "application/json", "type": "text" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/login"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.test('Autenticación satisfactoria', function () { pm.expect(json.message).to.eql('Autenticación satisfactoria'); });"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "username", "value": "demo" },
+    { "key": "password", "value": "123456" }
+  ]
+}
