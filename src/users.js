@@ -8,37 +8,47 @@ const usuarios = new Map();
 
 // Registra un usuario nuevo si no existe previamente
 async function registrarUsuario(username, password) {
-  // Validaciones básicas
-  if (!username || !password) {
+  if (typeof username !== 'string' || typeof password !== 'string') {
+    throw new Error('Datos inválidos');
+  }
+  const u = username.trim();
+  const p = password;
+  if (!u || !p) {
     throw new Error('Usuario y contraseña son requeridos');
   }
-
-  if (usuarios.has(username)) {
+  if (u.length < 3 || u.length > 30) {
+    throw new Error('Usuario inválido');
+  }
+  if (!/^[a-zA-Z0-9_.-]+$/.test(u)) {
+    throw new Error('Usuario inválido');
+  }
+  if (p.length < 6 || p.length > 64) {
+    throw new Error('Contraseña inválida');
+  }
+  if (usuarios.has(u)) {
     throw new Error('El usuario ya existe');
   }
 
-  // Hash de contraseña (cost 10)
-  const passwordHash = await bcrypt.hash(password, 10);
-
-  // Persistencia en memoria
-  usuarios.set(username, { username, passwordHash });
-
-  return { username };
+  const passwordHash = await bcrypt.hash(p, 10);
+  usuarios.set(u, { username: u, passwordHash });
+  return { username: u };
 }
 
 // Verifica credenciales de inicio de sesión
 async function autenticarUsuario(username, password) {
-  if (!username || !password) {
+  if (typeof username !== 'string' || typeof password !== 'string') {
+    throw new Error('Datos inválidos');
+  }
+  const u = username.trim();
+  const p = password;
+  if (!u || !p) {
     throw new Error('Usuario y contraseña son requeridos');
   }
-
-  const registro = usuarios.get(username);
+  const registro = usuarios.get(u);
   if (!registro) {
-    return false; // Usuario no encontrado
+    return false;
   }
-
-  // Comparación segura usando bcrypt
-  const coincide = await bcrypt.compare(password, registro.passwordHash);
+  const coincide = await bcrypt.compare(p, registro.passwordHash);
   return coincide;
 }
 
@@ -46,4 +56,3 @@ module.exports = {
   registrarUsuario,
   autenticarUsuario,
 };
-

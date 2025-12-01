@@ -44,7 +44,8 @@ app.post('/api/register', async (req, res) => {
     res.status(201).json({ message: 'Registro exitoso', user: usuario.username });
   } catch (err) {
     // En caso de error de validación/conflicto, se retorna 400
-    res.status(400).json({ error: err.message });
+    const msg = typeof err?.message === 'string' ? err.message : 'Solicitud inválida';
+    res.status(400).json({ error: msg });
   }
 });
 
@@ -64,7 +65,8 @@ app.post('/api/login', async (req, res) => {
     res.json({ message: 'Autenticación satisfactoria' });
   } catch (err) {
     // Errores de validación/entrada
-    res.status(400).json({ error: err.message });
+    const msg = typeof err?.message === 'string' ? err.message : 'Solicitud inválida';
+    res.status(400).json({ error: msg });
   }
 });
 
